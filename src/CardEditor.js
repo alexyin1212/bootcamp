@@ -1,6 +1,8 @@
 import React from 'react';
 import './CardEditor.css';
 
+import { Link } from 'react-router-dom';
+
 class CardEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -8,6 +10,11 @@ class CardEditor extends React.Component {
   }
 
   addCard = () => {
+    if (!this.state.front.trim() || !this.state.back.trim()) {
+      alert('Cannot add empty card');
+      return;
+    }
+
     this.props.addCard(this.state);
     this.setState({ front: '', back: '' });
   };
@@ -24,7 +31,12 @@ class CardEditor extends React.Component {
           <td>{card.front}</td>
           <td>{card.back}</td>
           <td>
-            <button onClick={() => this.deleteCard(index)}>Delete card</button>
+            <button
+              disabled={this.props.cards.length === 1}
+              onClick={() => this.deleteCard(index)}
+            >
+              Delete card
+            </button>
           </td>
         </tr>
       );
@@ -58,7 +70,7 @@ class CardEditor extends React.Component {
         />
         <button onClick={this.addCard}>Add card</button>
         <hr />
-        <button onClick={this.props.switchMode}>Go to card viewer</button>
+        <Link to="/viewer">Go to card viewer</Link>
       </div>
     );
   }

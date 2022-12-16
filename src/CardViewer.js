@@ -1,51 +1,56 @@
 import React from 'react';
+import './CardViewer.css';
+
+import { Link } from 'react-router-dom';
 
 class CardViewer extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
-      count: 1
-    }
+      currentIndex: 0,
+      displayFront: true,
+    };
   }
 
-  IncrementItem = () => {
-    if (this.state.count < this.props.cards.length) {
-      this.setState({ count: this.state.count + 1 });
+  nextCard = () => {
+    if (this.state.currentIndex < this.props.cards.length - 1) {
+      this.setState({
+        currentIndex: this.state.currentIndex + 1,
+        displayFront: true,
+      });
     }
-  }
-  
-  DecreaseItem = () => {
-    if (this.state.count > 1) {
-      this.setState({ count: this.state.count - 1 });
+  };
+
+  prevCard = () => {
+    if (this.state.currentIndex > 0) {
+      this.setState({
+        currentIndex: this.state.currentIndex - 1,
+        displayFront: true,
+      });
     }
-  }
+  };
+
+  flipCard = () => this.setState({ displayFront: !this.state.displayFront });
 
   render() {
-    const cards = this.props.cards.map((card) => {
-        return (
-            <div>
-                {card.front}
-            </div>
-        );
-      });
-    
+    // this uses the ternary operator:
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator
+    const card = this.props.cards[this.state.currentIndex][
+      this.state.displayFront ? 'front' : 'back'
+    ];
+
     return (
       <div>
         <h2>Card Viewer</h2>
-        <div>
-            <button onClick={this.flip}>{cards[this.state.count-1]}</button>
+        Card {this.state.currentIndex + 1} out of {this.props.cards.length}.
+        <div class="card" onClick={this.flipCard}>
+          {card}
         </div>
-        <div>
-            <button onClick={this.DecreaseItem}>Previous</button>
-            <button onClick={this.IncrementItem}>Next</button>
-
-        </div>
-        <div>
-          Card {this.state.count}/{this.props.cards.length}
-        </div>
-
+        <br />
+        <button onClick={this.prevCard}>Prev card</button>
+        <button onClick={this.nextCard}>Next card</button>
         <hr />
-        <button onClick={this.props.switchMode}>Go to card editor</button>
+        <Link to="/editor">Go to card editor</Link>
       </div>
     );
   }
