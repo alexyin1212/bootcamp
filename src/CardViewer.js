@@ -42,14 +42,17 @@ class CardViewer extends React.Component {
     return (
       <div>
         <h2>Card Viewer</h2>
-        Card {this.state.currentIndex + 1} out of {this.props.cards.length}.
         <div class="card" onClick={this.flipCard}>
           {card}
         </div>
-        <br />
+        <div>
+        Card {this.state.currentIndex + 1} / {this.props.cards.length}
+        </div>
+        
+        <br/>
         <button onClick={this.prevCard}>Prev card</button>
         <button onClick={this.nextCard}>Next card</button>
-        <hr />
+        <hr/>
         <Link to="/editor">Go to card editor</Link>
       </div>
     );
