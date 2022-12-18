@@ -1,7 +1,10 @@
 import React from 'react';
 import './CardViewer.css';
 
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
+import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 class CardViewer extends React.Component {
   constructor(props) {
@@ -33,30 +36,46 @@ class CardViewer extends React.Component {
   flipCard = () => this.setState({ displayFront: !this.state.displayFront });
 
   render() {
-    // this uses the ternary operator:
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator
+    if (!isLoaded(this.props.cards)) {
+      return <div>Loading...</div>;
+    }
+
+    if (isEmpty(this.props.cards)) {
+      return <div>Page not found!</div>;
+    }
+    
     const card = this.props.cards[this.state.currentIndex][
       this.state.displayFront ? 'front' : 'back'
     ];
 
     return (
       <div>
-        <h2>Card Viewer</h2>
-        <div class="card" onClick={this.flipCard}>
+        <h2>{this.props.name}</h2>
+        <div className="card" onClick={this.flipCard}>
           {card}
         </div>
-        <div>
+        <br />
         Card {this.state.currentIndex + 1} / {this.props.cards.length}
-        </div>
-        
-        <br/>
+        <br></br>
         <button onClick={this.prevCard}>Prev card</button>
         <button onClick={this.nextCard}>Next card</button>
-        <hr/>
-        <Link to="/editor">Go to card editor</Link>
+        <hr />
+        <Link to="/">Home</Link>
       </div>
     );
   }
 }
 
-export default CardViewer;
+const mapStateToProps = (state, props) => {
+  const deck = state.firebase.data[props.match.params.deckId];
+  const name = deck && deck.name;
+  const cards = deck && deck.cards;
+  return { cards: cards, name: name };
+};
+
+export default compose(
+  withRouter,
+  firebaseConnect(props => {
+    const deckId = props.match.params.deckId;
+    return [{ path: `/flashcards/${deckId}`, storeAs: deckId }];
+  }), connect(mapStateToProps),)(CardViewer);
